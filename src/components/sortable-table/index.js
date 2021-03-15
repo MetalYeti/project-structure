@@ -65,6 +65,7 @@ export default class SortableTable {
       id: headersConfig.find(item => item.sortable).id,
       order: 'asc'
     },
+    rowsAsLink = {base_link: '', item: ''},
     isSortLocally = false,
     step = 20,
     start = 1,
@@ -74,6 +75,7 @@ export default class SortableTable {
     this.headersConfig = headersConfig;
     this.url = new URL(url, BACKEND_URL);
     this.sorted = sorted;
+    this.rowsAsLink = rowsAsLink;
     this.isSortLocally = isSortLocally;
     this.step = step;
     this.start = start;
@@ -164,7 +166,13 @@ export default class SortableTable {
   }
 
   getTableRows(data) {
-    return data.map(item => `
+    return this.rowsAsLink.base_link 
+    ? data.map(item => `
+      <a class="sortable-table__row" href="${this.rowsAsLink.base_link}${item[this.rowsAsLink.item]}">
+        ${this.getTableRow(item, data)}
+      </a>`
+    ).join('') 
+    : data.map(item => `
       <div class="sortable-table__row">
         ${this.getTableRow(item, data)}
       </div>`
@@ -193,9 +201,11 @@ export default class SortableTable {
         ${this.getTableBody(this.data)}
 
         <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
-
         <div data-element="emptyPlaceholder" class="sortable-table__empty-placeholder">
-          No products
+          <div>
+            <p>Не найдено товаров удовлетворяющих выбранному критерию</p>
+            <button type="button" class="button-primary-outline">Очистить фильтры</button>
+          </div>
         </div>
       </div>`;
   }
